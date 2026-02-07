@@ -1,5 +1,7 @@
 from pathlib import Path
 import environ
+import os
+import dj_database_url
 
 # BASE_DIR points to folder with manage.py
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -10,7 +12,8 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY", default="dev-secret-key-change-me")
 DEBUG = env.bool("DEBUG", default=True)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost", ".onrender.com"])
+
 
 INSTALLED_APPS = [
     # Django default
@@ -52,6 +55,8 @@ MIDDLEWARE = [
 
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "ai_shop.urls"
@@ -86,6 +91,7 @@ DATABASES = {
         default=f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}"
     )
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -139,8 +145,13 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+STORAGES = {
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"

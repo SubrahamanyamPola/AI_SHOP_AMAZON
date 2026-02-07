@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: ai-shop
+    env: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: gunicorn ai_shop.wsgi:application
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: ai_shop.settings
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: REVOLUT_ME_LINK
+        value: "https://revolut.me/subrah2xwv"
+      - key: SITE_ID
+        value: "2"
+databases:
+  - name: ai-shop-db
+    plan: free
