@@ -1,0 +1,22 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h3>Your Cart</h3>
+<table class="table align-middle">
+  <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th><th></th></tr></thead>
+  <tbody>
+  {% for it in items %}
+    <tr>
+      <td>{{ it.product.name }}</td><td>{{ it.qty }}</td>
+      <td>€{{ it.product.price }}</td><td>€{{ it.subtotal|floatformat:2 }}</td>
+      <td><a class="btn btn-sm btn-outline-danger" href="{% url 'cart_remove' it.product.id %}">Remove</a></td>
+    </tr>
+  {% empty %}<tr><td colspan="5" class="text-muted">Your cart is empty.</td></tr>{% endfor %}
+  </tbody>
+</table>
+<div class="d-flex gap-2">
+  <span class="me-auto fs-5">Total: <strong>€{{ cart_total_cost|floatformat:2 }}</strong></span>
+  <a class="btn btn-secondary" href="{% url 'home' %}">Continue shopping</a>
+  <a class="btn btn-success" href="{% url 'checkout_address' %}">Checkout</a>
+</div>
+{% endblock %}

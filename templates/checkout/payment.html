@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="stepper mb-3">
+  <span class="step">Address</span><span class="step active">Payment</span><span class="step">Confirm</span>
+</div>
+
+<h4>Payment</h4>
+<p class="text-muted">Pay securely via Revolut (Card / Apple Pay) and then confirm.</p>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="fw-semibold">Total</div>
+      <div class="fw-bold">€{{ cart_total_cost|floatformat:2 }}</div>
+    </div>
+
+    <a class="btn btn-primary w-100 mb-2"
+       href="{{ REVOLUT_ME_LINK }}"
+       target="_blank" rel="noopener">
+      Pay with Revolut (Card / Apple Pay)
+    </a>
+
+    <form method="post" class="mt-2">
+      {% csrf_token %}
+      <button class="btn btn-success w-100">
+        I have paid (Continue)
+      </button>
+    </form>
+
+    <div class="text-muted small mt-2">
+      After completing payment in Revolut, return here and click “I have paid”.
+    </div>
+  </div>
+</div>
+{% endblock %}

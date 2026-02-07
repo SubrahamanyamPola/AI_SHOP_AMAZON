@@ -1,0 +1,27 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="hero mb-4">
+  <h2 class="fw-bold mb-1">Smarter shopping with NLP & AI recs</h2>
+  <p class="mb-0">Browse categories, see real-time sentiment, and get personalized suggestions.</p>
+</div>
+<div class="d-flex gap-2 mb-3 flex-wrap">
+  {% for c in nav_categories %}<a class="btn btn-outline-secondary btn-sm" href="{% url 'category' c.slug %}">{{ c.name }}</a>{% endfor %}
+</div>
+<div class="row g-3">
+  {% for p in products %}
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card card-product h-100 shadow-sm">
+      <img src="{{ p.image_url }}" class="card-img-top" alt="{{ p.name }}">
+      <div class="card-body">
+        <div class="small text-muted">{{ p.category.name }}</div>
+        <h6 class="card-title">{{ p.name|truncatechars:50 }}</h6>
+        <div class="text-muted mb-2">€{{ p.price }}</div>
+        <a class="btn btn-primary btn-sm" href="{% url 'product_detail' p.slug %}">View</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'cart_add' p.id %}">Add to cart</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

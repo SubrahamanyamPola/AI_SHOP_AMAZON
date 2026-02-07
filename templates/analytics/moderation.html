@@ -1,0 +1,29 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h3>Review Moderation <span class="badge bg-secondary">staff</span></h3>
+<p class="text-muted">Override automatic fake detection for specific reviews.</p>
+<table class="table table-sm align-middle">
+  <thead><tr><th>ID</th><th>Product</th><th>Text</th><th>Auto Score</th><th>Override</th><th>Action</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.product }}</td>
+      <td>{{ r.text }}{% if r.text|length == 120 %}…{% endif %}</td>
+      <td><span class="badge {% if r.score >= 0.7 %}bg-danger{% else %}bg-success{% endif %}">{{ r.score }}</span></td>
+      <td>{{ r.override }}</td>
+      <td>
+        <form method="post" action="{% url 'set_override' %}" class="d-flex gap-1">{% csrf_token %}
+          <input type="hidden" name="review_id" value="{{ r.id }}">
+          <select name="label" class="form-select form-select-sm">
+            <option value="auto">auto</option><option value="genuine">genuine</option><option value="fake">fake</option>
+          </select>
+          <button class="btn btn-sm btn-primary">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

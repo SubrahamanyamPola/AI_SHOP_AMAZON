@@ -1,0 +1,73 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-md-5"><img src="{{ product.image_url }}" class="img-fluid rounded" alt="{{ product.name }}"></div>
+  <div class="col-md-7">
+    <h3>{{ product.name }}</h3>
+    <p class="text-muted">Category: {{ product.category.name }} | <span class="fw-semibold">€{{ product.price }}</span></p>
+    <p>{{ product.description }}</p>
+    <div class="d-flex gap-2">
+      <a href="{% url 'cart_add' product.id %}" class="btn btn-success">Add to cart</a>
+      <a href="{% url 'recommendations' %}" class="btn btn-outline-primary">More like this</a>
+    </div>
+    <hr>
+    <h5>Sentiment (from recent reviews)</h5>
+    <div>TextBlob Polarity (avg): <span class="badge bg-info">{{ sentiment.tb_avg }}</span></div>
+    <div>VADER Compound (avg): <span class="badge bg-warning text-dark">{{ sentiment.vd_avg }}</span></div>
+    <small class="text-muted">Count: {{ sentiment.count }}</small>
+  </div>
+</div>
+
+<hr>
+<h5>Similar items</h5>
+<div class="row g-3">
+  {% for p in similar_items %}
+  <div class="col-6 col-md-3">
+    <div class="card h-100">
+      <img src="{{ p.image_url }}" class="card-img-top">
+      <div class="card-body">
+        <div class="small text-muted">{{ p.category.name }}</div>
+        <div class="fw-semibold">{{ p.name|truncatechars:48 }}</div>
+        <div class="text-muted">€{{ p.price }}</div>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'product_detail' p.slug %}">View</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<hr>
+<h5>Recent Reviews</h5>
+{% for r in reviews %}
+  <div class="border rounded p-2 mb-2 bg-white">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="rating">{% for i in "12345"|slice:":r.rating"|make_list %}★{% endfor %}{% for j in "12345"|slice:":5-r.rating"|make_list %}☆{% endfor %}</div>
+      <div>
+        <span class="badge bg-info text-dark">TB {{ r.tb }}</span>
+        <span class="badge bg-warning text-dark">VADER {{ r.vd }}</span>
+        <span class="badge {% if r.is_fake %}bg-danger{% else %}bg-success{% endif %}">
+          {% if r.is_fake %}suspected fake ({{ r.fake_score }}){% else %}likely genuine{% endif %}
+          {% if r.override != 'auto' %} · override: {{ r.override }}{% endif %}
+        </span>
+      </div>
+    </div>
+    <div class="small text-muted">{{ r.created_at }}</div>
+    <div class="mt-1">{{ r.text }}</div>
+  </div>
+{% empty %}<p class="text-muted">No reviews yet.</p>{% endfor %}
+
+{% if user.is_authenticated %}
+<hr>
+<h5>Add a review</h5>
+<form method="post" class="card p-3 shadow-sm">{% csrf_token %}
+  <div class="row g-2">
+    <div class="col-md-3">{{ form.rating.label_tag }}{{ form.rating }}</div>
+    <div class="col-12">{{ form.text.label_tag }}{{ form.text }}</div>
+  </div>
+  <button class="btn btn-primary mt-2">Submit</button>
+</form>
+{% else %}
+<p class="text-muted">Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to add a review.</p>
+{% endif %}
+{% endblock %}

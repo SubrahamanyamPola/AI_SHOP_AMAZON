@@ -1,0 +1,78 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Commerce</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/app.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{% url 'home' %}">AI<span>Commerce</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item dropdown dropdown-mega">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Categories</a>
+          <div class="dropdown-menu p-3">
+            <div class="row">
+              {% for c in nav_categories %}
+                <div class="col-6 col-md-3">
+                  <a class="dropdown-item" href="{% url 'category' c.slug %}">{{ c.name }}</a>
+                </div>
+              {% empty %}
+                <div class="col">No categories</div>
+              {% endfor %}
+            </div>
+          </div>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'recommendations' %}">My Recommendations</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'analytics_dashboard' %}">Models</a></li>
+      </ul>
+
+      <form class="d-flex" role="search" method="get" action="{% url 'search' %}">
+        <input class="form-control me-2" type="search" placeholder="Search products..." name="q" value="{{ request.GET.q }}">
+        <select class="form-select me-2" name="cat">
+          <option value="">All</option>
+          {% for c in nav_categories %}
+            <option value="{{ c.slug }}"{% if request.GET.cat == c.slug %} selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-outline-info" type="submit">Search</button>
+      </form>
+
+      <ul class="navbar-nav ms-3 align-items-center">
+        <li class="nav-item"><a class="nav-link" href="{% url 'cart_view' %}">Cart ({{ cart_total_qty }})</a></li>
+
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <form method="post" action="{% url 'logout' %}" class="d-inline m-0 p-0">
+              {% csrf_token %}
+              <button class="nav-link btn btn-link p-0 text-decoration-none" type="submit">Logout</button>
+            </form>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-4">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{% if message|safe %}{{ message|safe }}{% else %}{{ message }}{% endif %}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</body>
+</html>

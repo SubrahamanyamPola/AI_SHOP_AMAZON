@@ -1,0 +1,21 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h3>Recommended for you</h3>
+<p class="text-muted">Based on item content & average ratings, diversified.</p>
+<div class="row g-3">
+  {% for p in products %}
+  <div class="col-6 col-md-3">
+    <div class="card h-100">
+      <img src="{{ p.image_url }}" class="card-img-top">
+      <div class="card-body">
+        <div class="small text-muted">{{ p.category.name }}</div>
+        <div class="fw-semibold">{{ p.name|truncatechars:50 }}</div>
+        <div class="text-muted">€{{ p.price }}</div>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'product_detail' p.slug %}">View</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
