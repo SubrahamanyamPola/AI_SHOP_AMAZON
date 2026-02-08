@@ -10,7 +10,7 @@ urlpatterns = [
     path('checkout/', include('checkout.urls')),
     path('analytics/', include('analytics.urls')),
     path('accounts/', include('accounts.urls')),
-
+    path("admin/", admin.site.urls),
     # ✅ add this line for Google login
     path('accounts/', include('allauth.urls')),
 ]
