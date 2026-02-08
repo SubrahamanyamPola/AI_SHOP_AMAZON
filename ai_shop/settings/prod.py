@@ -1,20 +1,32 @@
 from .base import *
+import os
 
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = False
 
-# Render runs behind a proxy, so tell Django how to detect https
+# ✅ Render runs behind a proxy (important)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
 
-# If you enable this, above header is important to avoid redirect issues
-SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=False)
+# ✅ This prevents common 400/CSRF issues on Render
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.onrender.com",
+]
 
-SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
-CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=True)
+# If you set a custom domain, add it too:
+# CSRF_TRUSTED_ORIGINS += ["https://yourdomain.com"]
 
-# Fix common 403/CSRF issues on Render + custom domain later
-CSRF_TRUSTED_ORIGINS = env.list(
-    "CSRF_TRUSTED_ORIGINS",
-    default=[
-        "https://*.onrender.com",
-    ],
-)
+# ✅ Ensure your exact Render URL is allowed (avoid DisallowedHost 400)
+# Add your service host explicitly if you know it:
+if "ai-shop-amazon.onrender.com" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("ai-shop-amazon.onrender.com")
+
+# If you move to Postgres later, set DATABASE_URL in Render env and switch like this:
+# import dj_database_url
+# DATABASES = {
+#     "default": dj_database_url.config(conn_max_age=600, ssl_require=True)
+# }
+
+# Security (optional but good)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False  # Render already handles HTTPS; keep False to avoid loops
